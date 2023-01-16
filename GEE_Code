@@ -1,0 +1,111 @@
+//////////////////////////////////////////////////////////////
+//////////// Carvalho et al 2023 - Spatial Layers ////////////
+//////////////////////////////////////////////////////////////
+//////// script by Angélica Resende (gel.florestl@gmail.com) /
+//////////////////////////////////////////////////////////////
+
+//_______________________INSTRUCTIONS_______________________//
+// Choose below the layers you are interested in. 
+// Change the description, mainly the option "image" in the 
+// exporting commands (lines 58 and 84), and then press the "Run"
+// button above this script, then goes to the tab tasks in the 
+// right panel and run the task to save the files into your drive 
+
+
+//// Opening study area limits////////////////////////////////
+var BrAmazon = ee.FeatureCollection("users/gelflorestal/Synergize/BrAmazon_Carvalho_et_al_2023");
+
+//// Opening metadata table////////////////////////////////
+var metadata = ee.FeatureCollection("users/gelflorestal/Synergize/Metadata_Carvalho_et_al_2023");
+
+//////////////////////////////////////////////////////////////////////
+//// Opening and saving Resulting layers to your Google Drive /////////
+///////////////////////////////////////////////////////////////////////
+//// 1) Aquatic - Benthic /////////////////////////////////////////////
+//// 2) Aquatic - Heteroptera /////////////////////////////////////////
+//// 3) Aquatic - Odonata /////////////////////////////////////////////
+//// 4) Aquatic - Fish ////////////////////////////////////////////////
+//// 5) Aquatic - Macrophyte //////////////////////////////////////////
+//// 6) Wetland - Bird ////////////////////////////////////////////////
+//// 7) Wetland - Woody vegetation/////////////////////////////////////
+//// 8) Upland - Ant //////////////////////////////////////////////////
+//// 9) Upland - Dung beetle //////////////////////////////////////////
+//// 10) Upland - Bird ////////////////////////////////////////////////
+//// 11) Upland - Woody vegetation ////////////////////////////////////
+//// 12) Sum of the means by habitat //////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+//// Opening from repo /////
+
+var BENTHIC = ee.Image("users/gelflorestal/Synergize/Benthic");
+var HETEROP = ee.Image("users/gelflorestal/Synergize/Heteroptera");
+var ODONATA = ee.Image("users/gelflorestal/Synergize/Odonata");
+var FISH    = ee.Image("users/gelflorestal/Synergize/Fish");
+var MACROPH = ee.Image("users/gelflorestal/Synergize/Macrophyte");
+var WETBIRD = ee.Image("users/gelflorestal/Synergize/Bird_wet");
+var WETVEGE = ee.Image("users/gelflorestal/Synergize/Tree_wet");
+var ANT     = ee.Image("users/gelflorestal/Synergize/Ant");
+var DBEETLE = ee.Image("users/gelflorestal/Synergize/DungBeetle");
+var UPBIRD  = ee.Image("users/gelflorestal/Synergize/Bird");
+var UPVEGE  = ee.Image("users/gelflorestal/Synergize/Tree");
+var AVGRP = ee.Image("users/gelflorestal/Synergize/AverageResearchProb");
+
+// Viewing // Example
+Map.setCenter(-59.92, -3.57, 4)
+Map.addLayer(AVGRP,{"palette":["feffe7","143bff"]},"Average Research Probability")
+Map.addLayer(metadata.style({pointSize: 1, pointShape: 'circle'}),{},"metadata")
+
+//// Saving to drive //// Example for Average Reserach Probability,
+//// replace names to save other layer
+Export.image.toDrive({
+                  image: AVGRP,
+                  folder: 'Carvalho_et_al_2023',
+                  region: BrAmazon,
+                  description: 'AVG_ResearchProb_Carvalho_et_al_2023',
+                  scale: 1000,
+                  crs: "EPSG:4326",
+                  maxPixels: 10e10
+}) 
+
+//// Opening and saving drivers layers to your Google Drive //////////
+//////////////////////////////////////////////////////////////////////
+//// 1) Number of consecutive dry months - NDRYM /////////////////////
+//// 2) Research and education centers - REDUC ///////////////////////
+//// 3) Acessibility must be downloaded from Weiss et al 2018 ////////
+//// 4) Land Tenure - LTENU //////////////////////////////////////////
+//// 5) Nearby Deforestation and Degradation probab. - NEDND /////////
+//////////////////////////////////////////////////////////////////////
+{
+var NDRYM = ee.Image("users/gelflorestal/Synergize/NDRYM_period81-20").clip(BrAmazon);
+var REDUC = ee.Image("users/gelflorestal/Synergize/REF_Amz_30m").clip(BrAmazon);
+var LTENU = ee.Image("users/gelflorestal/Synergize/LandTenure_reclass_from_Imaflora").clip(BrAmazon);
+var NEDND = ee.Image("users/gelflorestal/Synergize/NearbyDeforDegrad_from_Bullock").clip(BrAmazon);
+}
+
+//// Exporting to your Google Drive /// Example for one layer
+Export.image.toDrive({
+                  image: NEDND,
+                  folder: 'Carvalho_et_al_2023',
+                  region: BrAmazon,
+                  description: 'NearbyDeforDegrad_from_Bullock',
+                  scale: 1000,
+                  crs: "EPSG:4326",
+                  maxPixels: 10e10
+}) 
+
+// Exporting the limits of the study area ////
+Export.table.toDrive({
+                  collection: BrAmazon,
+                  folder: 'Carvalho_et_al_2023',
+                  description: 'BrAmazon_lim_Carvalho_et_al_2023'
+}) 
+
+////
+
+// Exporting metadata ////
+Export.table.toDrive({
+                  collection: metadata,
+                  folder: 'Carvalho_et_al_2023',
+                  description: 'Metadata_Carvalho_et_al_2023'
+}) 
+
+////
